@@ -1,15 +1,5 @@
 import * as cdk from '@aws-cdk/core';
-import {
-  HttpApi,
-  HttpIntegrationType,
-  HttpMethod,
-  HttpRoute,
-  HttpRouteIntegrationConfig,
-  HttpRouteKey,
-  IHttpRouteIntegration,
-  PayloadFormatVersion,
-  VpcLink
-} from '@aws-cdk/aws-apigatewayv2';
+import {HttpApi, HttpMethod, HttpRoute, HttpRouteKey, VpcLink} from '@aws-cdk/aws-apigatewayv2';
 import {DefaultInstanceTenancy, SecurityGroup, Vpc} from "@aws-cdk/aws-ec2";
 import {ApplicationLoadBalancer, ListenerAction} from "@aws-cdk/aws-elasticloadbalancingv2";
 import {HttpAlbIntegration, HttpProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
@@ -64,8 +54,9 @@ export class CdkPlaygroundStack extends cdk.Stack {
       integration: new HttpAlbIntegration({
         listener: listener,
         vpcLink: vpcLink,
+        method: HttpMethod.GET,
       }),
-      routeKey: HttpRouteKey.with("/404", HttpMethod.GET),
+      routeKey: HttpRouteKey.with("/406", HttpMethod.GET),
     })
 
   }
