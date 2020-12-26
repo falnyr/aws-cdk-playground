@@ -1,27 +1,36 @@
 import * as cdk from '@aws-cdk/core';
-import * as s3 from '@aws-cdk/aws-s3';
-import * as lambda from "@aws-cdk/aws-lambda";
-import {EventType} from '@aws-cdk/aws-s3';
-import {RemovalPolicy} from "@aws-cdk/core";
+import {
+  HttpApi,
+  HttpIntegrationType,
+  HttpMethod,
+  HttpRoute,
+  HttpRouteIntegrationConfig,
+  HttpRouteKey,
+  IHttpRouteIntegration,
+  PayloadFormatVersion
+} from '@aws-cdk/aws-apigatewayv2';
 
 export class CdkPlaygroundStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const bucket = new s3.Bucket(this, 'MyFirstBucket', {
-      versioned: true,
-      removalPolicy: RemovalPolicy.DESTROY
-    });
+    const api = new HttpApi(this, 'my-api');
 
-    const handler = new lambda.Function(this, "WidgetHandler", {
-      runtime: lambda.Runtime.NODEJS_12_X,
-      code: lambda.Code.fromAsset("resources"),
-      handler: "widgets.main",
-      environment: {
-        BUCKET: bucket.bucketName
-      }
-    });
+    const route = new HttpRoute(this, 'route1', {
+      httpApi: api,
+      integration: new DummyIntegration(),
+      routeKey: HttpRouteKey.with("/404", HttpMethod.GET),
+    })
+  }
+}
 
-    // b.addEventNotification(EventType.OBJECT_CREATED, )
+class DummyIntegration implements IHttpRouteIntegration {
+  public bind(): HttpRouteIntegrationConfig {
+    return {
+      type: HttpIntegrationType.HTTP_PROXY,
+      payloadFormatVersion: PayloadFormatVersion.VERSION_1_0,
+      uri: 'https://http.cat/404',
+      method: HttpMethod.GET,
+    };
   }
 }
