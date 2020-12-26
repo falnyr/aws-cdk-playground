@@ -29,7 +29,7 @@ export class CdkPlaygroundStack extends cdk.Stack {
     const sg1 = new SecurityGroup(this, 'SG1', { vpc });
 
     const vpcLink = new VpcLink(this, 'VpcLink', { vpc });
-    vpcLink.addSubnets(...vpc.publicSubnets)
+    vpcLink.addSubnets(...vpc.privateSubnets)
     vpcLink.addSecurityGroups(sg1)
 
     const lb = new ApplicationLoadBalancer(this, 'LB', {
